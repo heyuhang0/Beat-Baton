@@ -18,7 +18,7 @@ public class CubeController : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 		if (Time.time > nextCubeTime) {
-			nextCubeTime = Time.time + 0.5f;
+			nextCubeTime = Time.time + 1/Setting.cubeFreq;
 			CreateNewCube(Random.Range(-3, 3), Random.Range(0.5f, 3));
 		}
 	}

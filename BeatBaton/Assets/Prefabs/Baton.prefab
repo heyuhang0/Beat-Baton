@@ -114,8 +114,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   zPosition: 2
   debugWindow: {fileID: 0}
-  greenLower: {x: 40, y: 130, z: 90}
-  greenUpper: {x: 100, y: 255, z: 255}
+  greenLower: {x: 50, y: 80, z: 10}
+  greenUpper: {x: 80, y: 255, z: 255}
   batonRangeX: {x: -5, y: 5}
   batonRangeY: {x: 0.5, y: 2.3}
   serverPort: 0

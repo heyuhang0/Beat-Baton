@@ -23,6 +23,7 @@ public class MainController : MonoBehaviour {
 		batonTrans = baton.GetComponent<Transform>();
 
 		client = new NetworkClient();
+		client.RegisterHandler(44, OnVibrationCommand);
 	}
 	
 	// Update is called once per frame
@@ -57,6 +58,11 @@ public class MainController : MonoBehaviour {
 		client.Connect(serverIP, serverPort);
 		networkState = NetworkState.Connecting;
 		Debug.Log("Connecting...");
+	}
+
+	private void OnVibrationCommand(NetworkMessage netMsg) {
+		Debug.Log("Vibrate...");
+		Handheld.Vibrate();
 	}
 
 	public void onClickConnect() {

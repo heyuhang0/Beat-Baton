@@ -25,6 +25,8 @@ public class CubeBehaviors : MonoBehaviour {
 		if (other.gameObject.CompareTag("Wall")) {
 			Selfdestruct();
 			ShakeCamera();
+			scoreCount -= 3;
+			UpdateScore();
 		} else if (other.gameObject.CompareTag("Baton")) {
 			Selfdestruct();
 			scoreCount ++;
@@ -33,7 +35,8 @@ public class CubeBehaviors : MonoBehaviour {
 	}
 
 	void ShakeCamera() {
-		iTween.ShakeRotation(playerCamera, new Vector3(2, 2, 2), 1);
+		iTween.ShakeRotation(playerCamera, new Vector3(1, 1, 1), 0.7f);
+		BatonController.vibrate();
 	}
 
 	void Selfdestruct() {

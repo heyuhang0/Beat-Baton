@@ -25,7 +25,7 @@ public class BatonController : MonoBehaviour
 
     void Start()
     {
-        webCamTexture = new WebCamTexture(WebCamTexture.devices[0].name, 640, 480, 60);
+        webCamTexture = new WebCamTexture(WebCamTexture.devices[Setting.cameraIndex].name, 640, 480, 120);
         webCamTexture.Play();
 
         tex = new Texture2D(webCamTexture.width, webCamTexture.height, TextureFormat.RGBA32, false);
@@ -144,6 +144,10 @@ public class BatonController : MonoBehaviour
             }
             debugWindow.texture = tex;
         }
+    }
+
+    public static void vibrate() {
+        NetworkServer.SendToAll(44, new UserMessage());
     }
 }
 
