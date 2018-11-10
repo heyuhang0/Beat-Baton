@@ -35,14 +35,12 @@ public class GameController : MonoBehaviour {
 				audioSource.Pause();
 			}
 		}
-		if (Time.time > MusicDelay) {
+		if (Time.timeSinceLevelLoad > MusicDelay) {
 			audioSource.Play();
 			MusicDelay = float.MaxValue;
 		}
 
-		Debug.Log(Time.time);
-
-		if (Time.time > nextCubeTime) {
+		if (Time.timeSinceLevelLoad > nextCubeTime) {
 			Vector2[] cubes = cubeSequence.GetNext();
 
 			foreach (Vector2 cube in cubes) {
