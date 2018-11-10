@@ -3,9 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class Setting : MonoBehaviour {
-
-	public static float cubeFreq = 1;
 	public static int cameraIndex = 0;
+	public static string level = "WakeMeUp";
 
 	// Use this for initialization
 	void Start () {

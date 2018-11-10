@@ -25,11 +25,11 @@ public class CubeBehaviors : MonoBehaviour {
 		if (other.gameObject.CompareTag("Wall")) {
 			Selfdestruct();
 			ShakeCamera();
-			scoreCount -= 3;
+			scoreCount -= 1;
 			UpdateScore();
 		} else if (other.gameObject.CompareTag("Baton")) {
 			Selfdestruct();
-			scoreCount ++;
+			scoreCount += 1;
 			UpdateScore();
 		}
 	}

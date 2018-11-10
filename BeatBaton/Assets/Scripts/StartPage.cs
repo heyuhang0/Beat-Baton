@@ -24,12 +24,12 @@ public class StartPage : MonoBehaviour {
 	}
 
 	public void OnButtonStart () {
-		Setting.cubeFreq = 1;
+		Setting.level = "WakeMeUp";
 		SceneManager.LoadScene("MainScene");
 	}
 
 	public void OnButtonStart2 () {
-		Setting.cubeFreq = 2;
+		Setting.level = "60_bpm";
 		SceneManager.LoadScene("MainScene");
 	}
 
