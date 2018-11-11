@@ -18,7 +18,7 @@ public class StartPage : MonoBehaviour {
 
 	public void OnButtonStart () {
 		Setting.level = "WakeMeUp";
-		SceneManager.LoadScene("MainScene");
+		SceneManager.LoadScene("LevelSelect");
 	}
 
 	public void onButtonOptions () {

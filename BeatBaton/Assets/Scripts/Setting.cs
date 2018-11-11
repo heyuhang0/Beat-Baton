@@ -3,16 +3,19 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class Setting : MonoBehaviour {
-	public static int cameraIndex = 0;
-	public static string level = "WakeMeUp";
+	public static int cameraIndex;
+	public static int cameraMultipiler;
+	public static bool cameraWindowEnable;
+	public static string level;
 
-	// Use this for initialization
-	void Start () {
-		
+	static Setting() {
+		LoadDefault();
 	}
-	
-	// Update is called once per frame
-	void Update () {
-		
+
+	static void LoadDefault () {
+		cameraIndex = 0;
+		cameraMultipiler = 2;
+		cameraWindowEnable = true;
+		level = "WakeMeUp";
 	}
 }

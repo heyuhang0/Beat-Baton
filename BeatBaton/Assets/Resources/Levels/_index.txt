@@ -1,0 +1,2 @@
+60 BPM Test,    Test_60bpm,     Easy,       00:30
+Wake Me Up,     WakeMeUp,       Hard,       04:09

@@ -22,11 +22,13 @@ public class BatonController : MonoBehaviour
     private Texture2D tex;
     private float realBatonX, realBatonY;
     private Quaternion nextDirection;
+    private int cm = Setting.cameraMultipiler;
 
     void Start()
     {
-        webCamTexture = new WebCamTexture(WebCamTexture.devices[Setting.cameraIndex].name, 640, 480, 120);
+        webCamTexture = new WebCamTexture(WebCamTexture.devices[Setting.cameraIndex].name, 320*cm, 480*cm, 120);
         webCamTexture.Play();
+        debugWindow.enabled = Setting.cameraWindowEnable;
 
         tex = new Texture2D(webCamTexture.width, webCamTexture.height, TextureFormat.RGBA32, false);
         backgroundSubtractor = BackgroundSubtractorMOG2.Create(500, 16, true);
@@ -72,23 +74,23 @@ public class BatonController : MonoBehaviour
     void CamUpdate()
     {
         CvUtil.GetWebCamMat(webCamTexture, ref frame);
-        Cv2.GaussianBlur(frame, blurred, new Size(5, 5), 0);
+        Cv2.GaussianBlur(frame, blurred, new Size(2*cm + 1, 2*cm + 1), 0);
 
         backgroundSubtractor.Apply(blurred, maskBG);
-        Cv2.Erode(maskBG, maskBG, nm, default(Point?), 2);
-        Cv2.Dilate(maskBG, maskBG, nm, default(Point?), 5);
+        Cv2.Erode(maskBG, maskBG, nm, default(Point?), 1*cm);
+        Cv2.Dilate(maskBG, maskBG, nm, default(Point?), 2*cm);
 
         Cv2.CvtColor(blurred, hsv, ColorConversionCodes.BGR2HSV);
         Cv2.InRange(hsv, greenLowerMat, greenUpperMat, maskColor);
-        Cv2.Erode(maskColor, maskColor, nm, default(Point?), 2);
-        Cv2.Dilate(maskColor, maskColor, nm, default(Point?), 5);
+        Cv2.Erode(maskColor, maskColor, nm, default(Point?), 1*cm);
+        Cv2.Dilate(maskColor, maskColor, nm, default(Point?), 2*cm);
 
         //Cv2.CvtColor(blurred, yCrCb, ColorConversionCodes.BGR2YCrCb);
         //Cv2.InRange(yCrCb, new Scalar(0, 0, 0), new Scalar(160, 120, 120), maskYCrCb);
 
         Cv2.BitwiseAnd(maskBG, maskColor, mask);
-        Cv2.Dilate(mask, mask, nm, default(Point?), 10);
-        Cv2.Erode(mask, mask, nm, default(Point?), 10);
+        Cv2.Dilate(mask, mask, nm, default(Point?), 5*cm);
+        Cv2.Erode(mask, mask, nm, default(Point?), 5*cm);
 
         Point[][] points;
         HierarchyIndex[] indexs;
