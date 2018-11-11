@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
 public class GameController : MonoBehaviour {
@@ -9,16 +10,21 @@ public class GameController : MonoBehaviour {
 	public float initialZ;
 	public Vector2 cubeRangeX, cubeRangeY;
 	public float MusicDelay;
-	public GameObject pauseCanvas;
+	public GameObject finalCanvas, pauseCanvas, debugCanvas;
+	public Text finalSocre;
 
-	private float nextCubeTime;
+	private float nextCubeTime, levelEndTime;
 	private CubeSequence cubeSequence;
 	private AudioSource audioSource;
+	private bool gameEnded = false;
 	// Use this for initialization
 	void Start () {
+		CubeBehaviors.scoreCount = 0;
 		Time.timeScale = 1;
-		pauseCanvas.SetActive(false);
 		cubeTemplate.SetActive(false);
+		pauseCanvas.SetActive(false);
+		finalCanvas.SetActive(false);
+		debugCanvas.SetActive(true);
 
 		string fullLevelName = "Levels/" + Setting.level;
 		LoadMusic(fullLevelName);
@@ -29,9 +35,7 @@ public class GameController : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		Debug.Log(Time.timeSinceLevelLoad);
-
-		if (Input.GetKeyDown(KeyCode.Escape)) {
+		if (Input.GetKeyDown(KeyCode.Escape) && !gameEnded) {
 			if (IsPaused()) {
 				Resume();
 			} else {
@@ -47,8 +51,8 @@ public class GameController : MonoBehaviour {
 			Vector2[] cubes = cubeSequence.GetNext();
 
 			foreach (Vector2 cube in cubes) {
-				float x = MapRange(cube.x, -1, 1, cubeRangeX.x, cubeRangeX.y);
-				float y = MapRange(cube.y, -1, 1, cubeRangeY.x, cubeRangeY.y);
+				float x = Lib.MapRange(cube.x, -1, 1, cubeRangeX.x, cubeRangeX.y);
+				float y = Lib.MapRange(cube.y, -1, 1, cubeRangeY.x, cubeRangeY.y);
 				CreateNewCube(x, y);
 			}
 
@@ -58,21 +62,33 @@ public class GameController : MonoBehaviour {
 				nextCubeTime = float.MaxValue;
 			}
 		}
+
+		if (!audioSource.isPlaying && MusicDelay == float.MaxValue && Time.timeScale == 1 && !gameEnded) {
+			gameEnded = true;
+			finalCanvas.SetActive(true);
+			finalSocre.text = CubeBehaviors.scoreCount.ToString();
+		}
+
 	}
 
 	private bool IsPaused() {
 		return Time.timeScale == 0;
 	}
+
+	private bool musicPlayingBeforePause;
 	private void Pause() {
 		pauseCanvas.SetActive(true);
 		Time.timeScale = 0;
-		audioSource.Pause();
+
+		musicPlayingBeforePause = audioSource.isPlaying;
+		if (musicPlayingBeforePause)
+			audioSource.Pause();
 	}
 
 	private void Resume() {
 		pauseCanvas.SetActive(false);
 		Time.timeScale = 1;
-		if (MusicDelay == float.MaxValue) {
+		if (musicPlayingBeforePause) {
 			audioSource.Play();
 		}
 	}
@@ -104,11 +120,6 @@ public class GameController : MonoBehaviour {
 		newCube.transform.SetPositionAndRotation(new Vector3(x, y, initialZ), new Quaternion());
 		newCube.SetActive(true);
 	}
-
-	float MapRange(float value, float sourceLow, float sourceHigh, float dstLow, float dstHigh)
-    {
-        return (value - sourceLow) / (sourceHigh - sourceLow) * (dstHigh - dstLow) + dstLow;
-    }
 
 	class CubeSequence {
 		private float[] timestamps;

@@ -119,8 +119,8 @@ public class BatonController : MonoBehaviour
             float radius;
             Cv2.MinEnclosingCircle(points[indexOfMax], out center, out radius);
 
-            realBatonX = MapRange(center.X, webCamTexture.width, 0, batonRangeX.x, batonRangeX.y);
-            realBatonY = MapRange(center.Y, webCamTexture.height, 0, batonRangeY.x, batonRangeY.y);
+            realBatonX = Lib.MapRange(center.X, webCamTexture.width, 0, batonRangeX.x, batonRangeX.y);
+            realBatonY = Lib.MapRange(center.Y, webCamTexture.height, 0, batonRangeY.x, batonRangeY.y);
         }
 
         if (debugWindow.IsActive())
@@ -129,11 +129,6 @@ public class BatonController : MonoBehaviour
             frame.SetTo(0, mask);
             UpdateDebugWindow(frame, false);
         }
-    }
-
-    float MapRange(float value, float sourceLow, float sourceHigh, float dstLow, float dstHigh)
-    {
-        return (value - sourceLow) / (sourceHigh - sourceLow) * (dstHigh - dstLow) + dstLow;
     }
 
     void UpdateDebugWindow(Mat frame, bool convert = false)

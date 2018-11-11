@@ -4,21 +4,38 @@ using UnityEngine;
 
 public class CubeBehaviors : MonoBehaviour {
 
-	public float speed;
+	public float  endZ, travelTime;
+	public AudioSource timeReference;
 	public GameObject scoreObj;
 	public GameObject brokenCube;
 	public GameObject playerCamera;
 	
+	private float startZ;
 	private TextMesh scoreText;
-	private static float scoreCount = 0;
+	public static int scoreCount = 0;
+	private float startTime;
 
 	void Start () {
 		scoreText = scoreObj.GetComponent<TextMesh>();
+		startTime = getExactTime();
+		startZ = transform.position.z;
 	}
 	
 	// Update is called once per frame
 	void Update () {
-		transform.Translate(new Vector3(0, 0, -speed) * Time.deltaTime);
+		Vector3 oldPosition = transform.position;
+		float x = oldPosition.x;
+		float y = oldPosition.y;
+		float z = Lib.MapRange(getExactTime(), startTime, startTime + travelTime, startZ, endZ);
+		transform.position = new Vector3(x, y, z);
+	}
+
+	private float getExactTime() {
+		float t = timeReference.time;
+		if (t != 0) {
+			return t;
+		}
+		return Time.timeSinceLevelLoad - travelTime;
 	}
 
 	void OnTriggerEnter (Collider other) {
@@ -28,6 +45,10 @@ public class CubeBehaviors : MonoBehaviour {
 			scoreCount -= 1;
 			UpdateScore();
 		} else if (other.gameObject.CompareTag("Baton")) {
+			Selfdestruct();
+			scoreCount += 1;
+			UpdateScore();
+		}	else if (other.gameObject.CompareTag("DebugWall")) {
 			Selfdestruct();
 			scoreCount += 1;
 			UpdateScore();
