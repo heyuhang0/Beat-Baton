@@ -9,12 +9,15 @@ public class GameController : MonoBehaviour {
 	public float initialZ;
 	public Vector2 cubeRangeX, cubeRangeY;
 	public float MusicDelay;
+	public GameObject pauseCanvas;
 
 	private float nextCubeTime;
 	private CubeSequence cubeSequence;
 	private AudioSource audioSource;
 	// Use this for initialization
 	void Start () {
+		Time.timeScale = 1;
+		pauseCanvas.SetActive(false);
 		cubeTemplate.SetActive(false);
 
 		string fullLevelName = "Levels/" + Setting.level;
@@ -26,13 +29,13 @@ public class GameController : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
+		Debug.Log(Time.timeSinceLevelLoad);
+
 		if (Input.GetKeyDown(KeyCode.Escape)) {
-			if (Time.timeScale == 0) {
-				Time.timeScale = 1;
-				audioSource.Play();
+			if (IsPaused()) {
+				Resume();
 			} else {
-				Time.timeScale = 0;
-				audioSource.Pause();
+				Pause();
 			}
 		}
 		if (Time.timeSinceLevelLoad > MusicDelay) {
@@ -55,6 +58,35 @@ public class GameController : MonoBehaviour {
 				nextCubeTime = float.MaxValue;
 			}
 		}
+	}
+
+	private bool IsPaused() {
+		return Time.timeScale == 0;
+	}
+	private void Pause() {
+		pauseCanvas.SetActive(true);
+		Time.timeScale = 0;
+		audioSource.Pause();
+	}
+
+	private void Resume() {
+		pauseCanvas.SetActive(false);
+		Time.timeScale = 1;
+		if (MusicDelay == float.MaxValue) {
+			audioSource.Play();
+		}
+	}
+
+	public void OnResumeClick() {
+		Resume();
+	}
+
+	public void OnRestart() {
+		SceneManager.LoadScene("MainScene");
+	}
+
+	public void OnExit() {
+		SceneManager.LoadScene("LevelSelect");
 	}
 
 	void LoadMusic(string name) {

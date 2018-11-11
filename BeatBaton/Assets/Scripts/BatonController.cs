@@ -51,6 +51,11 @@ public class BatonController : MonoBehaviour
         NetworkServer.maxDelay = 0;
     }
 
+    void OnDestroy () {
+        webCamTexture.Stop();
+        NetworkServer.Shutdown();
+    }
+
     private void OnServerReceived(NetworkMessage netMsg)
     {
         UserMessage Msg = netMsg.ReadMessage<UserMessage>();
