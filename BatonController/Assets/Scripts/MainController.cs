@@ -6,9 +6,9 @@ using UnityEngine.UI;
 
 public class MainController : MonoBehaviour {
 	public GameObject baton;
-	public string serverIP;
 	public int serverPort;
 	public Text ipTextInput;
+	public Text profileTextInput;
 	public Text connectButtonText;
 
 	private Transform batonTrans;
@@ -16,6 +16,7 @@ public class MainController : MonoBehaviour {
 
 	enum NetworkState {Disconnected, Connecting, OnConnected, Connected};
 	private NetworkState networkState = NetworkState.Disconnected;
+	private string serverIP, profileName;
 	private float deltaAngle = 0;
 
 	void Start () {
@@ -45,6 +46,7 @@ public class MainController : MonoBehaviour {
 
 			UserMessage msg = new UserMessage();
 			msg.orientation = batonTrans.rotation;
+			msg.profile = profileName;
 
 			client.Send(64, msg);
 			Debug.Log("Sending");
@@ -66,6 +68,9 @@ public class MainController : MonoBehaviour {
 	}
 
 	public void onClickConnect() {
+		serverIP = ipTextInput.GetComponent<Text>().text;
+		profileName = profileTextInput.GetComponent<Text>().text;
+
 		if (networkState == NetworkState.Disconnected) {
 			Connect();
 			deltaAngle = getBatonTrueAngleY() + deltaAngle - 270;
@@ -76,11 +81,6 @@ public class MainController : MonoBehaviour {
 			networkState = NetworkState.Disconnected;
 			SetButtonText("Connect");
 		}
-	}
-
-	public void onIPEndEdit() {
-		serverIP = ipTextInput.GetComponent<Text>().text;
-		Debug.Log("IP changed to: " + serverIP);
 	}
 
 	void SetButtonText(string newText) {
@@ -100,5 +100,6 @@ public class MainController : MonoBehaviour {
 
 public class UserMessage : MessageBase
 {	
+	public string profile;
 	public Quaternion orientation;
 }

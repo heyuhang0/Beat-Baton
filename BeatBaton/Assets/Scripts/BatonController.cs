@@ -11,17 +11,14 @@ public class BatonController : MonoBehaviour
 {
     public float zPosition;
     public RawImage debugWindow;
-    public Vector3 greenLower, greenUpper;
     public Vector2 batonRangeX, batonRangeY;
     public int serverPort;
+    public GameObject batonTemplate;
 
     private WebCamTexture webCamTexture;
     private BackgroundSubtractorMOG2 backgroundSubtractor;
-    private Scalar greenLowerMat, greenUpperMat;
-    private Mat frame, blurred, maskBG, maskColor, maskYCrCb, mask, hsv, yCrCb, nm, debugFrame;
+    private Mat frame, blurred, maskBG, maskColor, mask, hsv, nm, debugMask, debugFrame;
     private Texture2D tex;
-    private float realBatonX, realBatonY;
-    private Quaternion nextDirection;
     private int cm = Setting.cameraMultipiler;
 
     void Start()
@@ -36,15 +33,11 @@ public class BatonController : MonoBehaviour
         blurred = new Mat();
         maskBG = new Mat();
         maskColor = new Mat();
-        maskYCrCb = new Mat();
         mask = new Mat();
         hsv = new Mat();
-        yCrCb = new Mat();
         nm = new Mat();
+        debugMask = new Mat(webCamTexture.height, webCamTexture.width, MatType.CV_8UC1);
         debugFrame = new Mat();
-
-        greenLowerMat = new Scalar(greenLower[0], greenLower[1], greenLower[2]);
-        greenUpperMat = new Scalar(greenUpper[0], greenUpper[1], greenUpper[2]);
 
         NetworkServer.RegisterHandler(64, OnServerReceived);
         NetworkServer.Listen(serverPort);
@@ -59,7 +52,13 @@ public class BatonController : MonoBehaviour
     private void OnServerReceived(NetworkMessage netMsg)
     {
         UserMessage Msg = netMsg.ReadMessage<UserMessage>();
-        nextDirection = Msg.orientation;
+        foreach (BatonProfile profile in Setting.batonProfiles) {
+            if (profile.profileName == Msg.profile) {
+                profile.direction = Msg.orientation;
+                profile.SetActive();
+                break;
+            }
+        }
     }
 
     // Update is called once per frame
@@ -69,11 +68,34 @@ public class BatonController : MonoBehaviour
         {
             CamUpdate();
         }
+        UpdateBatons();
+    }
 
-        transform.rotation = nextDirection;
-        transform.position = new Vector3(realBatonX, realBatonY, zPosition);
-        transform.Translate(new Vector3(0, -1.0f, 0), Space.Self);
-        // Debug.Log("FPS: " + 1.0f / Time.deltaTime);
+    private List<GameObject> batons = new List<GameObject>();
+    void UpdateBatons() {
+        List<BatonProfile> activeProfiles = new List<BatonProfile>();
+        foreach (BatonProfile profile in Setting.batonProfiles) {
+            if (profile.IsActive()) {
+                activeProfiles.Add(profile);
+            }
+        }
+        CheckBatonNum(activeProfiles.Count);
+        for (int i = 0; i < activeProfiles.Count; i++) {
+            batons[i].transform.rotation = activeProfiles[i].direction;
+            Vector2 Pos2D = activeProfiles[i].position;
+            batons[i].transform.position = new Vector3(Pos2D.x, Pos2D.y, zPosition);
+            batons[i].transform.Translate(new Vector3(0, -1.0f, 0), Space.Self);
+            batons[i].GetComponent<Renderer>().material.color = activeProfiles[i].color;
+        }
+    }
+
+    void CheckBatonNum (int expectedNum) {
+        while (batons.Count < expectedNum) {
+            batons.Add(Instantiate(batonTemplate));
+        }
+        for (int i = 0; i < batons.Count; i++) {
+            batons[i].SetActive(i < expectedNum);
+        }
     }
 
     void CamUpdate()
@@ -85,48 +107,66 @@ public class BatonController : MonoBehaviour
         Cv2.Erode(maskBG, maskBG, nm, default(Point?), 1*cm);
         Cv2.Dilate(maskBG, maskBG, nm, default(Point?), 2*cm);
 
-        Cv2.CvtColor(blurred, hsv, ColorConversionCodes.BGR2HSV);
-        Cv2.InRange(hsv, greenLowerMat, greenUpperMat, maskColor);
-        Cv2.Erode(maskColor, maskColor, nm, default(Point?), 1*cm);
-        Cv2.Dilate(maskColor, maskColor, nm, default(Point?), 2*cm);
+        Cv2.CvtColor(blurred, hsv, ColorConversionCodes.RGB2HSV);
 
-        //Cv2.CvtColor(blurred, yCrCb, ColorConversionCodes.BGR2YCrCb);
-        //Cv2.InRange(yCrCb, new Scalar(0, 0, 0), new Scalar(160, 120, 120), maskYCrCb);
-
-        Cv2.BitwiseAnd(maskBG, maskColor, mask);
-        Cv2.Dilate(mask, mask, nm, default(Point?), 5*cm);
-        Cv2.Erode(mask, mask, nm, default(Point?), 5*cm);
-
-        Point[][] points;
-        HierarchyIndex[] indexs;
-        Cv2.FindContours(mask, out points, out indexs, RetrievalModes.External, ContourApproximationModes.ApproxSimple);
-
-
-        if (points.Length > 0)
+        if (debugWindow.IsActive())
         {
-            int indexOfMax = 0;
-            double maximumArea = 0;
-            for (int i = 0; i < points.Length; i++)
-            {
-                double size = Cv2.ContourArea(points[i]);
-                if (size > maximumArea)
-                {
-                    maximumArea = size;
-                    indexOfMax = i;
-                }
-            }
-            Point2f center;
-            float radius;
-            Cv2.MinEnclosingCircle(points[indexOfMax], out center, out radius);
+            debugMask.SetTo(0);
+        }
 
-            realBatonX = Lib.MapRange(center.X, webCamTexture.width, 0, batonRangeX.x, batonRangeX.y);
-            realBatonY = Lib.MapRange(center.Y, webCamTexture.height, 0, batonRangeY.x, batonRangeY.y);
+        foreach (BatonProfile profile in Setting.batonProfiles) {
+            if (!profile.IsActive()) {
+                continue;
+            }
+
+            Scalar hsvLowerMat = new Scalar(profile.hsvLower.x, profile.hsvLower.y, profile.hsvLower.z);
+            Scalar hsvUpperMat = new Scalar(profile.hsvUpper.x, profile.hsvUpper.y, profile.hsvUpper.z);
+
+            Cv2.InRange(hsv, hsvLowerMat, hsvUpperMat, maskColor);
+            Cv2.Erode(maskColor, maskColor, nm, default(Point?), 1*cm);
+            Cv2.Dilate(maskColor, maskColor, nm, default(Point?), 2*cm);
+
+            Cv2.BitwiseAnd(maskBG, maskColor, mask);
+            Cv2.Dilate(mask, mask, nm, default(Point?), 5*cm);
+            Cv2.Erode(mask, mask, nm, default(Point?), 5*cm);
+
+            Point[][] points;
+            HierarchyIndex[] indexs;
+            Cv2.FindContours(mask, out points, out indexs, RetrievalModes.External, ContourApproximationModes.ApproxSimple);
+
+
+            if (points.Length > 0)
+            {
+                int indexOfMax = 0;
+                double maximumArea = 0;
+                for (int i = 0; i < points.Length; i++)
+                {
+                    double size = Cv2.ContourArea(points[i]);
+                    if (size > maximumArea)
+                    {
+                        maximumArea = size;
+                        indexOfMax = i;
+                    }
+                }
+                Point2f center;
+                float radius;
+                Cv2.MinEnclosingCircle(points[indexOfMax], out center, out radius);
+
+                float x = Lib.MapRange(center.X, webCamTexture.width, 0, batonRangeX.x, batonRangeX.y);
+                float y = Lib.MapRange(center.Y, webCamTexture.height, 0, batonRangeY.x, batonRangeY.y);
+                profile.position = new Vector2(x, y);
+            }
+
+            if (debugWindow.IsActive())
+            {
+                Cv2.BitwiseOr(mask, debugMask, debugMask);
+            }
         }
 
         if (debugWindow.IsActive())
         {
-            Cv2.BitwiseNot(mask, mask);
-            frame.SetTo(0, mask);
+            Cv2.BitwiseNot(debugMask, debugMask);
+            frame.SetTo(0, debugMask);
             UpdateDebugWindow(frame, false);
         }
     }
@@ -151,9 +191,4 @@ public class BatonController : MonoBehaviour
     public static void vibrate() {
         NetworkServer.SendToAll(44, new UserMessage());
     }
-}
-
-public class UserMessage : MessageBase
-{	
-	public Quaternion orientation;
 }

@@ -14,10 +14,6 @@ public class StartPage : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 		string[] ips = LocalIPAddresses();
-		foreach (string ip in ips) {
-			Debug.Log(ip);
-		}
-
 		listContentItemTemplate.SetActive(false);
 
 		contentView.GetComponent<RectTransform>().sizeDelta = new Vector2(0, 20 * ips.Length);
