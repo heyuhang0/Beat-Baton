@@ -145,12 +145,14 @@ public class ProfileManager : MonoBehaviour {
 	void SetupCamera () {
 		webCamTexture = new WebCamTexture(WebCamTexture.devices[Setting.a.cameraIndex].name, 640, 480, 120);
         webCamTexture.Play();
-
-        tex = new Texture2D(webCamTexture.width, webCamTexture.height, TextureFormat.RGBA32, false);
 	}
 
 	void UpdatePreview(Mat frame, bool blackAndWhite = false)
     {
+		if (webCamTexture.width < 100)
+			return;
+		if (tex == null)
+			tex = new Texture2D(webCamTexture.width, webCamTexture.height, TextureFormat.RGBA32, false);
 		CvConvert.MatToTexture2D(frame, ref tex);
 		cameraPreview.texture = tex;
     }
