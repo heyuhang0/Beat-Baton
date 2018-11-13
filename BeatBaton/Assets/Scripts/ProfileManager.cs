@@ -21,7 +21,7 @@ public class ProfileManager : MonoBehaviour {
 	private Mat frame;
 	private BatonProfile newProfile;
 
-	private enum State {Normal, Waitting, Calibrating};
+	private enum State {Normal, Waitting, OnPress, Calibrating};
 	private State state = State.Normal;
 
 	public static string selectedProfile = "";
@@ -43,16 +43,19 @@ public class ProfileManager : MonoBehaviour {
         }
 	}
 
+	private int hl, hh, sl, sh, vl, vh;
 	void CamUpdate() {
 		CvUtil.GetWebCamMat(webCamTexture, ref frame);
 		Cv2.Flip(frame, frame, FlipMode.Y);
 		switch (state) {
 			case State.Normal:
 			break;
+
 			case State.Waitting:
 				Cv2.Circle(frame, 320, 240, 30, new Scalar(255, 0, 0), 3);
 				break;
-			case State.Calibrating:
+
+			case State.OnPress:
 
 				Mat blurred = new Mat();
 				Mat hsvMat = new Mat();
@@ -67,20 +70,26 @@ public class ProfileManager : MonoBehaviour {
 				hsvMat.Release();
 
 				newProfile.color = new Color((float)rgb.Item0/255, (float)rgb.Item1/255, (float)rgb.Item2/255);
-				int h = Mathf.Max(hsv.Item0 - 10, 0);
-				int s = Mathf.Max(hsv.Item1 - 50, 0);
-				int v = Mathf.Max(hsv.Item2 - 50, 0);
-				newProfile.hsvLower = new Vector3(h, s, v);
-				h = Mathf.Max(hsv.Item0 + 10, 0);
-				s = Mathf.Max(hsv.Item1 + 50, 0);
-				v = Mathf.Max(hsv.Item2 + 50, 0);
-				newProfile.hsvUpper = new Vector3(h, s, v);
+
+				hl = hsv.Item0 - 10;
+				sl = Mathf.Max(hsv.Item1 - 50, 0);
+				vl = Mathf.Max(hsv.Item2 - 50, 0);
+				hh = hsv.Item0 + 10;
+				sh = Mathf.Min(hsv.Item1 + 50, 255);
+				vh = Mathf.Min(hsv.Item2 + 50, 255);
 				
-				state = State.Normal;
-				Setting.a.batonProfiles.Add(newProfile);
+				state = State.Calibrating;
 				helpText2.SetActive(false);
+				break;
+
+			case State.Calibrating:
+				newProfile.hsvLower = new Vector3(hl, sl, vl);
+				newProfile.hsvUpper = new Vector3(hh, sh, vh);
+				Debug.Log("Color range: " + newProfile.hsvLower.ToString() + '\t' + newProfile.hsvUpper.ToString());
+				Setting.a.batonProfiles.Add(newProfile);
 				RefreshProfilesList();
-			break;
+				state = State.Normal;
+				break;
 		}
 		UpdatePreview(frame);
 	}
@@ -115,7 +124,7 @@ public class ProfileManager : MonoBehaviour {
 			}
 			Debug.Log("Calibrating...");
 			newProfile.profileName = nameRecv;
-			state = State.Calibrating;
+			state = State.OnPress;
 		}
     }
 

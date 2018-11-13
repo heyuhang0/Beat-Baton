@@ -2,11 +2,44 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
+using OpenCvSharp;
 
 public class Lib : MonoBehaviour {
 	public static float MapRange(float value, float sourceLow, float sourceHigh, float dstLow, float dstHigh)
     {
         return (value - sourceLow) / (sourceHigh - sourceLow) * (dstHigh - dstLow) + dstLow;
+    }
+}
+
+public class BetterCv2 {
+    public static void InRangeHSV(Mat frame, Vector3 hsvLower, Vector3 hsvUpper, Mat outputMask) {
+        Scalar hsvLowerMat, hsvUpperMat;
+        if (hsvLower.x >= 0 && hsvUpper.x <= 180) {
+            hsvLowerMat = new Scalar(hsvLower.x, hsvLower.y, hsvLower.z);
+            hsvUpperMat = new Scalar(hsvUpper.x, hsvUpper.y, hsvUpper.z);
+            Cv2.InRange(frame, hsvLowerMat, hsvUpperMat, outputMask);
+            return;
+        } else if (hsvLower.x < 0) {
+            hsvLowerMat = new Scalar(0, hsvLower.y, hsvLower.z);
+            hsvUpperMat = new Scalar(hsvUpper.x, hsvUpper.y, hsvUpper.z);
+            Cv2.InRange(frame, hsvLowerMat, hsvUpperMat, outputMask);
+            Mat tempMask = new Mat();
+            hsvLowerMat = new Scalar(180 + hsvLower.x, hsvLower.y, hsvLower.z);
+            hsvUpperMat = new Scalar(180, hsvUpper.y, hsvUpper.z);
+            Cv2.InRange(frame, hsvLowerMat, hsvUpperMat, tempMask);
+            Cv2.BitwiseOr(outputMask, tempMask, outputMask);
+            tempMask.Release();
+        } else {
+            hsvLowerMat = new Scalar(hsvLower.x, hsvLower.y, hsvLower.z);
+            hsvUpperMat = new Scalar(180, hsvUpper.y, hsvUpper.z);
+            Cv2.InRange(frame, hsvLowerMat, hsvUpperMat, outputMask);
+            Mat tempMask = new Mat();
+            hsvLowerMat = new Scalar(0, hsvLower.y, hsvLower.z);
+            hsvUpperMat = new Scalar(hsvUpper.x - 180, hsvUpper.y, hsvUpper.z);
+            Cv2.InRange(frame, hsvLowerMat, hsvUpperMat, tempMask);
+            Cv2.BitwiseOr(outputMask, tempMask, outputMask);
+            tempMask.Release();
+        }
     }
 }
 

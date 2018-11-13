@@ -119,10 +119,7 @@ public class BatonController : MonoBehaviour
                 continue;
             }
 
-            Scalar hsvLowerMat = new Scalar(profile.hsvLower.x, profile.hsvLower.y, profile.hsvLower.z);
-            Scalar hsvUpperMat = new Scalar(profile.hsvUpper.x, profile.hsvUpper.y, profile.hsvUpper.z);
-
-            Cv2.InRange(hsv, hsvLowerMat, hsvUpperMat, maskColor);
+            BetterCv2.InRangeHSV(hsv, profile.hsvLower, profile.hsvUpper, maskColor);
             Cv2.Erode(maskColor, maskColor, nm, default(Point?), 1*cm);
             Cv2.Dilate(maskColor, maskColor, nm, default(Point?), 2*cm);
 
