@@ -29,16 +29,14 @@ public class BatonController : MonoBehaviour
         webCamTexture.Play();
         debugWindow.enabled = Setting.a.cameraWindowEnable;
 
-        tex = new Texture2D(webCamTexture.width, webCamTexture.height, TextureFormat.RGBA32, false);
         backgroundSubtractor = BackgroundSubtractorMOG2.Create(500, 16, true);
-        frame = new Mat(webCamTexture.height, webCamTexture.width, MatType.CV_8UC4);
+        frame = new Mat();
         blurred = new Mat();
         maskBG = new Mat();
         maskColor = new Mat();
         mask = new Mat();
         hsv = new Mat();
         nm = new Mat();
-        debugMask = new Mat(webCamTexture.height, webCamTexture.width, MatType.CV_8UC1);
         debugFrame = new Mat();
 
         NetworkServer.RegisterHandler(64, OnServerReceived);
@@ -111,7 +109,7 @@ public class BatonController : MonoBehaviour
 
         Cv2.CvtColor(blurred, hsv, ColorConversionCodes.RGB2HSV);
 
-        if (debugWindow.IsActive())
+        if (DebugWindowAvailable())
         {
             debugMask.SetTo(0);
         }
@@ -159,13 +157,13 @@ public class BatonController : MonoBehaviour
                 profile.position = new Vector2(x, y);
             }
 
-            if (debugWindow.IsActive())
+            if (DebugWindowAvailable())
             {
                 Cv2.BitwiseOr(mask, debugMask, debugMask);
             }
         }
 
-        if (debugWindow.IsActive())
+        if (DebugWindowAvailable())
         {
             Cv2.BitwiseNot(debugMask, debugMask);
             frame.SetTo(0, debugMask);
@@ -173,9 +171,23 @@ public class BatonController : MonoBehaviour
         }
     }
 
+    bool DebugWindowAvailable() {
+        if (!debugWindow.IsActive())
+            return false;
+        // Make sure the camera is working (Avoid crash on Mac)
+        if (webCamTexture.width > 100) {
+            if (tex == null) {  
+                tex = new Texture2D(webCamTexture.width, webCamTexture.height, TextureFormat.RGBA32, false);
+                debugMask = new Mat(webCamTexture.height, webCamTexture.width, MatType.CV_8UC1);
+            }
+            return true;
+        }
+        return false;
+    }
+
     void UpdateDebugWindow(Mat frame, bool convert = false)
     {
-        if (debugWindow.IsActive())
+        if (DebugWindowAvailable())
         {
             if (convert)
             {
