@@ -87,6 +87,6 @@ public class BatonProfile {
 	}
 
 	public bool IsActive() {
-		return (System.DateTime.Now - this.lastConnectionTime).Seconds < 3;
+		return (System.DateTime.Now - this.lastConnectionTime).TotalSeconds < 3;
 	}
 }
