@@ -18,19 +18,23 @@ public class OptionsPage : MonoBehaviour {
 		
 	}
 
+	void OnDestroy () {
+		Setting.SaveGameData();
+	}
+
 	public void OnCameraSelect () {
-		Setting.cameraIndex ++;
-		if (Setting.cameraIndex >= WebCamTexture.devices.Length) {
-			Setting.cameraIndex = 0;
+		Setting.a.cameraIndex ++;
+		if (Setting.a.cameraIndex >= WebCamTexture.devices.Length) {
+			Setting.a.cameraIndex = 0;
 		}
 		refreshCameraName();
 	}
 
 	public void onCamResSelect() {
-		if (Setting.cameraMultipiler == 1) {
-			Setting.cameraMultipiler = 2;
+		if (Setting.a.cameraMultipiler == 1) {
+			Setting.a.cameraMultipiler = 2;
 		} else {
-			Setting.cameraMultipiler = 1;
+			Setting.a.cameraMultipiler = 1;
 		}
 		refreshResolution();
 	}
@@ -40,7 +44,7 @@ public class OptionsPage : MonoBehaviour {
 	}
 
 	public void OnShowCam () {
-		Setting.cameraWindowEnable = !Setting.cameraWindowEnable;
+		Setting.a.cameraWindowEnable = !Setting.a.cameraWindowEnable;
 		refreshShowCam();
 	}
 
@@ -48,19 +52,19 @@ public class OptionsPage : MonoBehaviour {
 		if (WebCamTexture.devices.Length == 0) {
 			cameraName.text = "No camera found";
 		} else {
-			if (Setting.cameraIndex >= WebCamTexture.devices.Length) {
-				Setting.cameraIndex = 0;
+			if (Setting.a.cameraIndex >= WebCamTexture.devices.Length) {
+				Setting.a.cameraIndex = 0;
 			}
 		}
-		cameraName.text = WebCamTexture.devices[Setting.cameraIndex].name;
+		cameraName.text = WebCamTexture.devices[Setting.a.cameraIndex].name;
 	}
 
 	private void refreshResolution () {
-		int m = Setting.cameraMultipiler;
+		int m = Setting.a.cameraMultipiler;
 		camResolution.text = (320 * m).ToString() + " X " + (240 * m).ToString();
 	}
 
 	private void refreshShowCam () {
-		camWindowEnable.text = Setting.cameraWindowEnable.ToString().ToUpper();
+		camWindowEnable.text = Setting.a.cameraWindowEnable.ToString().ToUpper();
 	}
 }

@@ -77,7 +77,7 @@ public class ProfileManager : MonoBehaviour {
 				newProfile.hsvUpper = new Vector3(h, s, v);
 				
 				state = State.Normal;
-				Setting.batonProfiles.Add(newProfile);
+				Setting.a.batonProfiles.Add(newProfile);
 				helpText2.SetActive(false);
 				RefreshProfilesList();
 			break;
@@ -94,9 +94,9 @@ public class ProfileManager : MonoBehaviour {
 	}
 
 	public void OnDelete () {
-		foreach (BatonProfile p in Setting.batonProfiles) {
+		foreach (BatonProfile p in Setting.a.batonProfiles) {
 			if (p.profileName == selectedProfile) {
-				Setting.batonProfiles.Remove(p);
+				Setting.a.batonProfiles.Remove(p);
 				break;
 			}
 		}
@@ -108,7 +108,7 @@ public class ProfileManager : MonoBehaviour {
 		if (state == State.Waitting) {
 			string nameRecv = netMsg.ReadMessage<UserMessage>().profile;
 
-			foreach (BatonProfile p in Setting.batonProfiles) {
+			foreach (BatonProfile p in Setting.a.batonProfiles) {
 				if (p.profileName == nameRecv) {
 					return;
 				}
@@ -121,7 +121,7 @@ public class ProfileManager : MonoBehaviour {
 
 	void RefreshProfilesList () {
 		listContentItemTemplate.SetActive(false);
-		contentView.GetComponent<RectTransform>().sizeDelta = new Vector2(600, 30 * Setting.batonProfiles.Count);
+		contentView.GetComponent<RectTransform>().sizeDelta = new Vector2(600, 30 * Setting.a.batonProfiles.Count);
 
 		foreach (Transform child in contentView.transform) {
 			if (child.gameObject != listContentItemTemplate) {
@@ -129,7 +129,7 @@ public class ProfileManager : MonoBehaviour {
 			}
 		}
 
-		foreach (BatonProfile p in Setting.batonProfiles) {
+		foreach (BatonProfile p in Setting.a.batonProfiles) {
 			GameObject newOne = Instantiate(listContentItemTemplate, parentTransform);
 			Text[] texts = newOne.GetComponentsInChildren<Text>();
 			texts[0].text = p.profileName;
@@ -143,7 +143,7 @@ public class ProfileManager : MonoBehaviour {
     }
 
 	void SetupCamera () {
-		webCamTexture = new WebCamTexture(WebCamTexture.devices[Setting.cameraIndex].name, 640, 480, 120);
+		webCamTexture = new WebCamTexture(WebCamTexture.devices[Setting.a.cameraIndex].name, 640, 480, 120);
         webCamTexture.Play();
 
         tex = new Texture2D(webCamTexture.width, webCamTexture.height, TextureFormat.RGBA32, false);

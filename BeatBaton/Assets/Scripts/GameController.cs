@@ -26,7 +26,7 @@ public class GameController : MonoBehaviour {
 		finalCanvas.SetActive(false);
 		debugCanvas.SetActive(true);
 
-		string fullLevelName = "Levels/" + Setting.level;
+		string fullLevelName = "Levels/" + Setting.a.level;
 		LoadMusic(fullLevelName);
 		LoadSequence(fullLevelName);
 

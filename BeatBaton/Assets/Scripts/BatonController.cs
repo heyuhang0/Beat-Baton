@@ -19,13 +19,13 @@ public class BatonController : MonoBehaviour
     private BackgroundSubtractorMOG2 backgroundSubtractor;
     private Mat frame, blurred, maskBG, maskColor, mask, hsv, nm, debugMask, debugFrame;
     private Texture2D tex;
-    private int cm = Setting.cameraMultipiler;
+    private int cm = Setting.a.cameraMultipiler;
 
     void Start()
     {
-        webCamTexture = new WebCamTexture(WebCamTexture.devices[Setting.cameraIndex].name, 320*cm, 480*cm, 120);
+        webCamTexture = new WebCamTexture(WebCamTexture.devices[Setting.a.cameraIndex].name, 320*cm, 480*cm, 120);
         webCamTexture.Play();
-        debugWindow.enabled = Setting.cameraWindowEnable;
+        debugWindow.enabled = Setting.a.cameraWindowEnable;
 
         tex = new Texture2D(webCamTexture.width, webCamTexture.height, TextureFormat.RGBA32, false);
         backgroundSubtractor = BackgroundSubtractorMOG2.Create(500, 16, true);
@@ -52,7 +52,7 @@ public class BatonController : MonoBehaviour
     private void OnServerReceived(NetworkMessage netMsg)
     {
         UserMessage Msg = netMsg.ReadMessage<UserMessage>();
-        foreach (BatonProfile profile in Setting.batonProfiles) {
+        foreach (BatonProfile profile in Setting.a.batonProfiles) {
             if (profile.profileName == Msg.profile) {
                 profile.direction = Msg.orientation;
                 profile.SetActive();
@@ -74,7 +74,7 @@ public class BatonController : MonoBehaviour
     private List<GameObject> batons = new List<GameObject>();
     void UpdateBatons() {
         List<BatonProfile> activeProfiles = new List<BatonProfile>();
-        foreach (BatonProfile profile in Setting.batonProfiles) {
+        foreach (BatonProfile profile in Setting.a.batonProfiles) {
             if (profile.IsActive()) {
                 activeProfiles.Add(profile);
             }
@@ -114,7 +114,7 @@ public class BatonController : MonoBehaviour
             debugMask.SetTo(0);
         }
 
-        foreach (BatonProfile profile in Setting.batonProfiles) {
+        foreach (BatonProfile profile in Setting.a.batonProfiles) {
             if (!profile.IsActive()) {
                 continue;
             }

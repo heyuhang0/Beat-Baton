@@ -1,29 +1,61 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 
 public class Setting : MonoBehaviour {
-	public static int cameraIndex;
-	public static int cameraMultipiler;
-	public static bool cameraWindowEnable;
-	public static string level;
-	public static List<BatonProfile> batonProfiles;
-
+	public static GameData a;
+	private static string dataFilePath = "/data.json";
 	static Setting() {
-		LoadDefault();
+		LoadGameData();
 	}
 
-	static void LoadDefault () {
-		cameraIndex = 0;
-		cameraMultipiler = 2;
-		cameraWindowEnable = true;
-		level = "WakeMeUp";
+	public static void SaveGameData()
+    {
+        string dataAsJson = JsonUtility.ToJson(a);
 
-		batonProfiles = new List<BatonProfile>();
-		// batonProfiles.Add(new BatonProfile("LightGreen", new Vector3(50, 80, 10), new Vector3(80, 255, 255), Color.green));
+        string filePath = Application.dataPath + dataFilePath;
+        File.WriteAllText (filePath, dataAsJson);
+
+		Debug.Log("Game data saved");
+    }
+
+	private static void LoadGameData()
+    {
+        string filePath = Application.dataPath + dataFilePath;
+
+        if (File.Exists (filePath)) {
+            string dataAsJson = File.ReadAllText (filePath);
+            a = JsonUtility.FromJson<GameData> (dataAsJson);
+			Debug.Log("Game data loaded");
+        } else {
+            LoadDefault();
+			Debug.Log("Game data sets to default");
+        }
+    }
+
+	private static void LoadDefault () {
+		a = new GameData();
+		a.cameraIndex = 0;
+		a.cameraMultipiler = 2;
+		a.cameraWindowEnable = true;
+		a.level = "WakeMeUp";
+
+		a.batonProfiles = new List<BatonProfile>();
 	}
 }
 
+[Serializable]
+public class GameData {
+	public int cameraIndex;
+	public int cameraMultipiler;
+	public bool cameraWindowEnable;
+	public string level;
+	public List<BatonProfile> batonProfiles;
+}
+
+[Serializable]
 public class BatonProfile {
 	public string profileName;
 	public Vector3 hsvLower, hsvUpper;
