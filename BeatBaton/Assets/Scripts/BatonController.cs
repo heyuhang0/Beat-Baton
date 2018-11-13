@@ -19,10 +19,12 @@ public class BatonController : MonoBehaviour
     private BackgroundSubtractorMOG2 backgroundSubtractor;
     private Mat frame, blurred, maskBG, maskColor, mask, hsv, nm, debugMask, debugFrame;
     private Texture2D tex;
-    private int cm = Setting.a.cameraMultipiler;
+    private int cm;
 
     void Start()
     {
+        cm = Setting.a.cameraMultipiler;
+
         webCamTexture = new WebCamTexture(WebCamTexture.devices[Setting.a.cameraIndex].name, 320*cm, 480*cm, 120);
         webCamTexture.Play();
         debugWindow.enabled = Setting.a.cameraWindowEnable;
