@@ -30,6 +30,10 @@ public class LevelSelector : MonoBehaviour {
 		}
 	}
 
+	public void OnDestroy () {
+		Setting.SaveGameData();
+	}
+
 	public void OnBack() {
 		SceneManager.LoadScene("StartPage");
 	}

@@ -31,7 +31,7 @@ public class CubeBehaviors : MonoBehaviour {
 	}
 
 	private float getExactTime() {
-		float t = timeReference.time;
+		float t = AudioVisualizer.AudioSampler.instance.GetAudioTime();
 		if (t != 0) {
 			return t;
 		}
