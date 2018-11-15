@@ -14,6 +14,7 @@ BeatBaton/Assets/AssetStoreTools*
 
 # Game data file
 BeatBaton/Assets/data.json*
+BatonController/Assets/data.json*
 
 # Visual Studio cache directory
 BatonController/.vs/

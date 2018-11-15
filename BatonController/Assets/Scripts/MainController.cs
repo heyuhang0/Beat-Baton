@@ -7,8 +7,8 @@ using UnityEngine.UI;
 public class MainController : MonoBehaviour {
 	public GameObject baton;
 	public int serverPort;
-	public Text ipTextInput;
-	public Text profileTextInput;
+	public Text ipTextInput, profileTextInput;
+	public Text ipTextPH, profileTextPH;
 	public Text connectButtonText;
 
 	private Transform batonTrans;
@@ -16,15 +16,19 @@ public class MainController : MonoBehaviour {
 
 	enum NetworkState {Disconnected, Connecting, OnConnected, Connected};
 	private NetworkState networkState = NetworkState.Disconnected;
-	private string serverIP, profileName;
 	private float deltaAngle = 0;
 
 	void Start () {
+		Screen.sleepTimeout = SleepTimeout.NeverSleep;
+
         Input.gyro.enabled = true;
 		batonTrans = baton.GetComponent<Transform>();
 
 		client = new NetworkClient();
 		client.RegisterHandler(44, OnVibrationCommand);
+
+		ipTextPH.GetComponent<Text>().text = Setting.a.ip;
+		profileTextPH.GetComponent<Text>().text = Setting.a.name;
 	}
 	
 	// Update is called once per frame
@@ -46,7 +50,7 @@ public class MainController : MonoBehaviour {
 
 			UserMessage msg = new UserMessage();
 			msg.orientation = batonTrans.rotation;
-			msg.profile = profileName;
+			msg.profile = Setting.a.name;
 
 			client.Send(64, msg);
 			Debug.Log("Sending");
@@ -57,10 +61,11 @@ public class MainController : MonoBehaviour {
 		}
 	}
 	void Connect() {
-		client.Connect(serverIP, serverPort);
+		client.Connect(Setting.a.ip, serverPort);
 		networkState = NetworkState.Connecting;
 		Debug.Log("Connecting...");
 	}
+
 
 	private void OnVibrationCommand(NetworkMessage netMsg) {
 		Debug.Log("Vibrate...");
@@ -68,8 +73,10 @@ public class MainController : MonoBehaviour {
 	}
 
 	public void onClickConnect() {
-		serverIP = ipTextInput.GetComponent<Text>().text;
-		profileName = profileTextInput.GetComponent<Text>().text;
+		if (ipTextInput.GetComponent<Text>().text != "")
+			Setting.a.ip = ipTextInput.GetComponent<Text>().text;
+		if (profileTextInput.GetComponent<Text>().text != "")
+			Setting.a.name = profileTextInput.GetComponent<Text>().text;
 
 		if (networkState == NetworkState.Disconnected) {
 			Connect();
@@ -81,6 +88,7 @@ public class MainController : MonoBehaviour {
 			networkState = NetworkState.Disconnected;
 			SetButtonText("Connect");
 		}
+		Setting.SaveGameData();
 	}
 
 	void SetButtonText(string newText) {
