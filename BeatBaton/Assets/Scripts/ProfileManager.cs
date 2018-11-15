@@ -56,11 +56,10 @@ public class ProfileManager : MonoBehaviour {
 				break;
 
 			case State.OnPress:
-
 				Mat blurred = new Mat();
 				Mat hsvMat = new Mat();
 
-				Cv2.GaussianBlur(frame, blurred, new Size(5, 5), 0);
+				Cv2.GaussianBlur(frame, blurred, new Size(9, 9), 0);
 				Cv2.CvtColor(blurred, hsvMat, ColorConversionCodes.RGB2HSV);
 				
 				Vec3b rgb = blurred.Get<Vec3b>(240, 320);
@@ -71,10 +70,10 @@ public class ProfileManager : MonoBehaviour {
 
 				newProfile.color = new Color((float)rgb.Item0/255, (float)rgb.Item1/255, (float)rgb.Item2/255);
 
-				hl = hsv.Item0 - 10;
-				sl = Mathf.Max(hsv.Item1 - 50, 0);
-				vl = Mathf.Max(hsv.Item2 - 50, 0);
-				hh = hsv.Item0 + 10;
+				hl = hsv.Item0 - 5;
+				sl = Mathf.Max(hsv.Item1 - 50, 60);
+				vl = Mathf.Max(hsv.Item2 - 50, 30);
+				hh = hsv.Item0 + 5;
 				sh = Mathf.Min(hsv.Item1 + 50, 255);
 				vh = Mathf.Min(hsv.Item2 + 50, 255);
 				

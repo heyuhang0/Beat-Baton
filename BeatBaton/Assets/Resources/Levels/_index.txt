@@ -1,5 +1,4 @@
 60 BPM Test,        Test_60bpm,         Easy,       00:30
 Wake Me Up,         WakeMeUp,           Hard,       04:09
-Abandoned Places,   AbandonedPlaces,    ,           1:10
-Energy,             bensound-energy,    ,           2:59
-Popdance,           bensound-popdance,  ,           2:59
+Energy,             bensound-energy,    medium,     02:59
+Popdance,           bensound-popdance,  Hard,       02:42
