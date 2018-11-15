@@ -119,39 +119,49 @@ public class BatonController : MonoBehaviour
                 continue;
             }
 
-            BetterCv2.InRangeHSV(hsv, profile.hsvLower, profile.hsvUpper, maskColor);
-            Cv2.Erode(maskColor, maskColor, nm, default(Point?), 1*cm);
-            Cv2.Dilate(maskColor, maskColor, nm, default(Point?), 2*cm);
+            for (int additionalRange = 0; additionalRange < 5; additionalRange ++) {
+                Vector3 hsvLower = new Vector3(profile.hsvLower.x - 2*additionalRange, profile.hsvLower.y - 20*additionalRange, profile.hsvLower.z - 20*additionalRange);
+                Vector3 hsvUpper = new Vector3(profile.hsvUpper.x + 2*additionalRange, profile.hsvUpper.y + 20*additionalRange, profile.hsvUpper.z + 20*additionalRange);
+                BetterCv2.InRangeHSV(hsv, hsvLower, hsvUpper, maskColor);
+                Cv2.Erode(maskColor, maskColor, nm, default(Point?), 1*cm);
+                Cv2.Dilate(maskColor, maskColor, nm, default(Point?), 2*cm);
 
-            Cv2.BitwiseAnd(maskBG, maskColor, mask);
-            Cv2.Dilate(mask, mask, nm, default(Point?), 5*cm);
-            Cv2.Erode(mask, mask, nm, default(Point?), 5*cm);
+                Cv2.BitwiseAnd(maskBG, maskColor, mask);
+                Cv2.Dilate(mask, mask, nm, default(Point?), 5*cm);
+                Cv2.Erode(mask, mask, nm, default(Point?), 5*cm);
 
-            Point[][] points;
-            HierarchyIndex[] indexs;
-            Cv2.FindContours(mask, out points, out indexs, RetrievalModes.External, ContourApproximationModes.ApproxSimple);
+                Point[][] points;
+                HierarchyIndex[] indexs;
+                Cv2.FindContours(mask, out points, out indexs, RetrievalModes.External, ContourApproximationModes.ApproxSimple);
 
 
-            if (points.Length > 0)
-            {
-                int indexOfMax = 0;
-                double maximumArea = 0;
-                for (int i = 0; i < points.Length; i++)
+                if (points.Length > 0)
                 {
-                    double size = Cv2.ContourArea(points[i]);
-                    if (size > maximumArea)
+                    int indexOfMax = 0;
+                    double maximumArea = 0;
+                    for (int i = 0; i < points.Length; i++)
                     {
-                        maximumArea = size;
-                        indexOfMax = i;
+                        double size = Cv2.ContourArea(points[i]);
+                        if (size > maximumArea)
+                        {
+                            maximumArea = size;
+                            indexOfMax = i;
+                        }
                     }
-                }
-                Point2f center;
-                float radius;
-                Cv2.MinEnclosingCircle(points[indexOfMax], out center, out radius);
+                    Point2f center;
+                    float radius;
+                    Cv2.MinEnclosingCircle(points[indexOfMax], out center, out radius);
 
-                float x = Lib.MapRange(center.X, webCamTexture.width, 0, batonRangeX.x, batonRangeX.y);
-                float y = Lib.MapRange(center.Y, webCamTexture.height, 0, batonRangeY.x, batonRangeY.y);
-                profile.position = new Vector2(x, y);
+                    float x = Lib.MapRange(center.X, webCamTexture.width, 0, batonRangeX.x, batonRangeX.y);
+                    float y = Lib.MapRange(center.Y, webCamTexture.height, 0, batonRangeY.x, batonRangeY.y);
+                    profile.position = new Vector2(x, y);
+
+                    Debug.Log(additionalRange + "\t" + hsvLower.ToString() + "\t" + hsvUpper.ToString());
+                    break;
+                }
+                else if (additionalRange == 4) {
+                    Debug.Log("Fuck you!!!!!");
+                }
             }
 
             if (DebugWindowAvailable())
