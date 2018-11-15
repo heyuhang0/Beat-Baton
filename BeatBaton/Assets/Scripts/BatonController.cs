@@ -120,8 +120,8 @@ public class BatonController : MonoBehaviour
             }
 
             for (int additionalRange = 0; additionalRange < 5; additionalRange ++) {
-                Vector3 hsvLower = new Vector3(profile.hsvLower.x - 2*additionalRange, profile.hsvLower.y - 20*additionalRange, profile.hsvLower.z - 20*additionalRange);
-                Vector3 hsvUpper = new Vector3(profile.hsvUpper.x + 2*additionalRange, profile.hsvUpper.y + 20*additionalRange, profile.hsvUpper.z + 20*additionalRange);
+                Vector3 hsvLower = Lib.Limit(profile.hsvLower - additionalRange * new Vector3(2, 20, 20), -50, 255, 60, 255, 30, 255);
+                Vector3 hsvUpper = Lib.Limit(profile.hsvUpper + additionalRange * new Vector3(2, 20, 20), -50, 255, 60, 255, 30, 255);
                 BetterCv2.InRangeHSV(hsv, hsvLower, hsvUpper, maskColor);
                 Cv2.Erode(maskColor, maskColor, nm, default(Point?), 1*cm);
                 Cv2.Dilate(maskColor, maskColor, nm, default(Point?), 2*cm);

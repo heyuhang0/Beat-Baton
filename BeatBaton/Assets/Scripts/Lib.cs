@@ -9,6 +9,13 @@ public class Lib : MonoBehaviour {
     {
         return (value - sourceLow) / (sourceHigh - sourceLow) * (dstHigh - dstLow) + dstLow;
     }
+
+    public static Vector3 Limit(Vector3 input, float xl, float xh, float yl, float yh, float zl, float zh) {
+        float x = Mathf.Min(Mathf.Max(input.x, xl), xh);
+        float y = Mathf.Min(Mathf.Max(input.y, yl), yh);
+        float z = Mathf.Min(Mathf.Max(input.z, zl), zh);
+        return new Vector3(x, y, z);
+    }
 }
 
 public class BetterCv2 {
