@@ -63,6 +63,7 @@ public class BatonProfile {
 	public Vector2 position;
 	public Quaternion direction;
 	public Color color;
+	public int score;
 
 	public BatonProfile (string name, Vector3 hsvLower, Vector3 hsvUpper, Color color) {
 		this.profileName = name;

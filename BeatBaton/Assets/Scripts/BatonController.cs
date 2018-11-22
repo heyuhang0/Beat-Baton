@@ -14,6 +14,7 @@ public class BatonController : MonoBehaviour
     public Vector2 batonRangeX, batonRangeY;
     public int serverPort;
     public GameObject batonTemplate;
+    public GameObject scoreTemplate;
 
     private WebCamTexture webCamTexture;
     private BackgroundSubtractorMOG2 backgroundSubtractor;
@@ -23,6 +24,9 @@ public class BatonController : MonoBehaviour
 
     void Start()
     {
+        batonTemplate.SetActive(false);
+        scoreTemplate.SetActive(false);
+
         cm = Setting.a.cameraMultipiler;
 
         webCamTexture = new WebCamTexture(WebCamTexture.devices[Setting.a.cameraIndex].name, 320*cm, 480*cm, 120);
@@ -42,6 +46,10 @@ public class BatonController : MonoBehaviour
         NetworkServer.RegisterHandler(64, OnServerReceived);
         NetworkServer.Listen(serverPort);
         NetworkServer.maxDelay = 0;
+
+        foreach (BatonProfile b in Setting.a.batonProfiles) {
+            b.score = 0;
+        }
     }
 
     void OnDestroy () {
@@ -72,6 +80,7 @@ public class BatonController : MonoBehaviour
     }
 
     private List<GameObject> batons = new List<GameObject>();
+    private List<GameObject> scores = new List<GameObject>();
     void UpdateBatons() {
         List<BatonProfile> activeProfiles = new List<BatonProfile>();
         foreach (BatonProfile profile in Setting.a.batonProfiles) {
@@ -86,15 +95,22 @@ public class BatonController : MonoBehaviour
             batons[i].transform.position = new Vector3(Pos2D.x, Pos2D.y, zPosition);
             batons[i].transform.Translate(new Vector3(0, -1.0f, 0), Space.Self);
             batons[i].GetComponent<Renderer>().material.color = activeProfiles[i].color;
+
+            scores[i].GetComponent<Text>().text = activeProfiles[i].score.ToString();
+            scores[i].GetComponentInChildren<RawImage>().color = activeProfiles[i].color;
         }
     }
 
     void CheckBatonNum (int expectedNum) {
         while (batons.Count < expectedNum) {
             batons.Add(Instantiate(batonTemplate));
+            GameObject newScoreObj = Instantiate(scoreTemplate);
+            newScoreObj.transform.SetParent(scoreTemplate.transform.parent);
+            scores.Add(newScoreObj);
         }
         for (int i = 0; i < batons.Count; i++) {
             batons[i].SetActive(i < expectedNum);
+            scores[i].SetActive(i < expectedNum);
         }
     }
 

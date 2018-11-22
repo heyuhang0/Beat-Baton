@@ -6,17 +6,14 @@ public class CubeBehaviors : MonoBehaviour {
 
 	public float  endZ, travelTime;
 	public AudioSource timeReference;
-	public GameObject scoreObj;
 	public GameObject brokenCube;
 	public GameObject playerCamera;
 	
 	private float startZ;
-	private TextMesh scoreText;
 	public static int scoreCount = 0;
 	private float startTime;
 
 	void Start () {
-		scoreText = scoreObj.GetComponent<TextMesh>();
 		startTime = getExactTime();
 		startZ = transform.position.z;
 	}
@@ -42,16 +39,10 @@ public class CubeBehaviors : MonoBehaviour {
 		if (other.gameObject.CompareTag("Wall")) {
 			Selfdestruct();
 			ShakeCamera();
-			scoreCount -= 1;
-			UpdateScore();
 		} else if (other.gameObject.CompareTag("Baton")) {
 			Selfdestruct();
-			scoreCount += 1;
-			UpdateScore();
 		}	else if (other.gameObject.CompareTag("DebugWall")) {
 			Selfdestruct();
-			scoreCount += 1;
-			UpdateScore();
 		}
 	}
 
@@ -63,9 +54,5 @@ public class CubeBehaviors : MonoBehaviour {
 	void Selfdestruct() {
 		Instantiate(brokenCube, transform.position, transform.rotation).SetActive(true);
 		Destroy(gameObject);
-	}
-
-	void UpdateScore() {
-		scoreText.text = "Score: " + scoreCount.ToString();
 	}
 }
