@@ -46,7 +46,26 @@ public class GameController : MonoBehaviour {
 	}
 
 	public void onFutureBeat() {
-		CreateNewCube(Random.Range(cubeRangeX.x, cubeRangeX.y), Random.Range(cubeRangeY.x, cubeRangeY.y));
+		float x = 0, y = 0;
+		for (int i = 0; i < 3 && !IsGoodPosition(x, y); i++) {
+			x = Random.Range(-1f, 1f);
+			y = Random.Range(-1f, 1f);
+			Debug.Log(x + "\t" + y + "\t" + lastCubeX + "\t" + lastCubeY);
+		}
+		x = Lib.MapRange(x, -1, 1, cubeRangeX.x, cubeRangeX.y);
+		y = Lib.MapRange(y, -1, 1, cubeRangeY.x, cubeRangeY.y);
+		CreateNewCube(x, y);
+	}
+
+	float lastCubeX = 0, lastCubeY = 0;
+	private bool IsGoodPosition(float x, float y) {
+		if (Mathf.Abs(x) < 0.2f && Mathf.Abs(y) < 0.5f)
+			return false;
+		if (Mathf.Pow((x - lastCubeX), 2) + Mathf.Pow((y - lastCubeY), 2) < 0.3*0.3)
+			return false;
+		lastCubeX = x;
+		lastCubeY = y;
+		return true;
 	}
 
 	private bool IsPaused() {
