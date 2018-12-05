@@ -12,6 +12,10 @@ BeatBaton/[Bb]uild/
 BeatBaton/[Bb]uilds/
 BeatBaton/Assets/AssetStoreTools*
 
+# Unity version file
+BeatBaton/ProjectSettings/ProjectVersion.txt
+BatonController/ProjectSettings/ProjectVersion.txt
+
 # Game data file
 BeatBaton/Assets/data.json*
 BatonController/Assets/data.json*
