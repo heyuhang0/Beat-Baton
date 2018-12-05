@@ -27,7 +27,7 @@ public class OptionsPage : MonoBehaviour {
 		if (Setting.a.cameraIndex >= WebCamTexture.devices.Length) {
 			Setting.a.cameraIndex = 0;
 		}
-		refreshCameraName();
+		SceneManager.LoadScene("Options"); // Reload page to load new camera
 	}
 
 	public void onCamResSelect() {
