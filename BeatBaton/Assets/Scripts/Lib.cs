@@ -18,6 +18,27 @@ public class Lib : MonoBehaviour {
     }
 }
 
+public class MyNetworkServer {
+    readonly static int port = 7755;
+    public static bool started = false;
+    private static void Init() {
+        NetworkServer.Listen(7755);
+        NetworkServer.maxDelay = 0;
+        started = true;
+    }
+
+    public static void RegisterHandler(short msgType, NetworkMessageDelegate handler) {
+        if (!started) {
+            Init();
+        }
+        NetworkServer.RegisterHandler(msgType, handler);
+    }
+
+    public static void UnregisterHandler(short msgType) {
+        NetworkServer.UnregisterHandler(msgType);
+    }
+}
+
 public class BetterCv2 {
     public static void InRangeHSV(Mat frame, Vector3 hsvLower, Vector3 hsvUpper, Mat outputMask) {
         Scalar hsvLowerMat, hsvUpperMat;

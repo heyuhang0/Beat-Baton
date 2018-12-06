@@ -43,9 +43,7 @@ public class BatonController : MonoBehaviour
         nm = new Mat();
         debugFrame = new Mat();
 
-        NetworkServer.RegisterHandler(64, OnServerReceived);
-        NetworkServer.Listen(serverPort);
-        NetworkServer.maxDelay = 0;
+        MyNetworkServer.RegisterHandler(64, OnServerReceived);
 
         foreach (BatonProfile b in Setting.a.batonProfiles) {
             b.score = 0;
@@ -54,7 +52,7 @@ public class BatonController : MonoBehaviour
 
     void OnDestroy () {
         webCamTexture.Stop();
-        NetworkServer.Shutdown();
+        MyNetworkServer.UnregisterHandler(64);
     }
 
     private void OnServerReceived(NetworkMessage netMsg)

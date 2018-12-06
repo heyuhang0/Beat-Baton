@@ -32,8 +32,7 @@ public class ProfileManager : MonoBehaviour {
 
 		RefreshProfilesList();
 
-		NetworkServer.RegisterHandler(64, OnServerReceived);
-        NetworkServer.Listen(serverPort);
+		MyNetworkServer.RegisterHandler(64, OnServerReceived);
 	}
 	
 	void Update () {
@@ -147,7 +146,7 @@ public class ProfileManager : MonoBehaviour {
 
 	void OnDestroy () {
         webCamTexture.Stop();
-		NetworkServer.Shutdown();
+		MyNetworkServer.UnregisterHandler(64);
     }
 
 	void SetupCamera () {
