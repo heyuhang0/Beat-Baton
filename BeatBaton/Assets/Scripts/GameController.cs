@@ -12,17 +12,17 @@ public class GameController : MonoBehaviour {
 	public Vector2 cubeRangeX, cubeRangeY;
 	public float MusicDelay;
 	public GameObject finalCanvas, pauseCanvas, debugCanvas;
-	public Text finalSocre;
+	public GameObject scoreCanvas, scoreViewContent, scoreTemplate;
 
 	private bool gameEnded = false;
 	// Use this for initialization
 	void Start () {
-		CubeBehaviors.scoreCount = 0;
 		Time.timeScale = 1;
 		cubeTemplate.SetActive(false);
 		pauseCanvas.SetActive(false);
 		finalCanvas.SetActive(false);
 		debugCanvas.SetActive(true);
+		scoreTemplate.SetActive(false);
 
 		string fullLevelName = "Levels/" + Setting.a.level;
 		LoadMusic(fullLevelName);
@@ -40,9 +40,38 @@ public class GameController : MonoBehaviour {
 
 		if (!SilentAudio.isPlaying && !NormalAudio.isPlaying && Time.timeScale == 1 && !gameEnded) {
 			gameEnded = true;
-			finalCanvas.SetActive(true);
-			finalSocre.text = CubeBehaviors.scoreCount.ToString();
+			OnGameOver();
 		}
+	}
+
+	void OnGameOver() {
+		scoreCanvas.SetActive(false);
+		finalCanvas.SetActive(true);
+
+		List<BatonProfile> nonZeroBatons = new List<BatonProfile>();
+		foreach (BatonProfile b in Setting.a.batonProfiles) {
+            if (b.score != 0)
+				nonZeroBatons.Add(b);
+        }
+		if (nonZeroBatons.Capacity == 0) {
+			return;
+		}
+		nonZeroBatons.Sort();
+		Debug.Log(nonZeroBatons.Capacity);
+		scoreViewContent.GetComponent<RectTransform>().sizeDelta = new Vector2(338, 40*nonZeroBatons.Count);
+		int highestScore = nonZeroBatons[0].score;
+		foreach (BatonProfile b in nonZeroBatons) {
+			CreateNewScoreItem(b.color, b.score, (float)b.score / highestScore);
+		}
+	}
+
+	void CreateNewScoreItem(Color color, int score, float length) {
+		GameObject newScoreItem = Instantiate(scoreTemplate);
+		newScoreItem.transform.SetParent(scoreTemplate.transform.parent);
+		newScoreItem.GetComponentInChildren<Text>().text = score.ToString();
+		newScoreItem.GetComponentInChildren<RawImage>().color = color;
+		newScoreItem.GetComponentInChildren<RectTransform>().sizeDelta = new Vector2(500*length-200, 40);
+		newScoreItem.SetActive(true);
 	}
 
 	public void onFutureBeat() {

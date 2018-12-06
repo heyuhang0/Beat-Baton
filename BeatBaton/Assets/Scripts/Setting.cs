@@ -56,7 +56,7 @@ public class GameData {
 }
 
 [Serializable]
-public class BatonProfile {
+public class BatonProfile: IComparable<BatonProfile> {
 	public string profileName;
 	public Vector3 hsvLower, hsvUpper;
 	public System.DateTime lastConnectionTime;
@@ -74,6 +74,10 @@ public class BatonProfile {
 
 		this.direction = new Quaternion();
 		this.position = new Vector2();
+	}
+
+	public int CompareTo(BatonProfile other) {
+		return other.score - this.score;
 	}
 
 	public BatonProfile () {

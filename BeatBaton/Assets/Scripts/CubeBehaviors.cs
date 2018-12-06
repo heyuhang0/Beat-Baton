@@ -10,7 +10,6 @@ public class CubeBehaviors : MonoBehaviour {
 	public GameObject playerCamera;
 	
 	private float startZ;
-	public static int scoreCount = 0;
 	private float startTime;
 
 	void Start () {
