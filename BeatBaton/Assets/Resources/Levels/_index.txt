@@ -1,8 +1,0 @@
-60 BPM Test,        Test_60bpm,                     Easy,       00:30
-Wake Me Up,         WakeMeUp,                       Hard,       04:09
-Energy,             bensound-energy,                Medium,     02:59
-Popdance,           bensound-popdance,              Hard,       02:42
-Say-Less-(Eptic-Remix),            Say-Less-(Eptic-Remix),         Hard,       03:00
-TRNDSTTR-(Lucian-Remix),           TRNDSTTR-(Lucian-Remix),        Hard,       01:29
-Propaganda,         Propaganda,                     Hard,       01:22
-Burning-Up-(Aero-Chord-Remix),         Burning-Up-(Aero-Chord-Remix),  Hard,       01:09

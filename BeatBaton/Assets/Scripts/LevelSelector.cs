@@ -10,24 +10,26 @@ public class LevelSelector : MonoBehaviour {
 	public Transform parentTransform;
 	public GameObject contentView;
 
-	private string[] indexRaw;
 	// Use this for initialization
 	void Start () {
+		MusicManager.ReloadMusic();
 		listContentItemTemplate.SetActive(false);
-		indexRaw = Resources.Load<TextAsset>("Levels/_index").text.Split('\n');
 
-		contentView.GetComponent<RectTransform>().sizeDelta = new Vector2(600, 30*indexRaw.Length);
-		foreach (string line in indexRaw) {
-			GameObject newOne = Instantiate(listContentItemTemplate, parentTransform);
-			Text[] texts = newOne.GetComponentsInChildren<Text>();
-			string[] indexes = line.Split(',');
-			string assetName = indexes[1].Replace(" ", "");
-			texts[0].text = indexes[0];
-			texts[1].text = indexes[3].Replace(" ", "");
-			texts[2].text = indexes[2].Replace(" ", "");
-			texts[3].text = assetName;
-			newOne.SetActive(true);
+		foreach (var item in MusicManager.playlist) {
+			AddItem(item.Key, (int)item.Value.length);
 		}
+	}
+
+	private int levelsContentHeight = 0;
+	private void AddItem(string name, int seconds) {
+		levelsContentHeight += 30;
+		contentView.GetComponent<RectTransform>().sizeDelta = new Vector2(600, levelsContentHeight);
+		GameObject newOne = Instantiate(listContentItemTemplate, parentTransform);
+		Text[] texts = newOne.GetComponentsInChildren<Text>();
+		texts[0].text = name;
+		string timeText = string.Format("{0:D2}:{1:D2}", seconds / 60, seconds % 60);
+		texts[1].text = timeText;
+		newOne.SetActive(true);
 	}
 
 	public void OnDestroy () {

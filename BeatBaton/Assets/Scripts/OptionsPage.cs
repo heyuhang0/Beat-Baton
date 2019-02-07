@@ -6,11 +6,13 @@ using UnityEngine.SceneManagement;
 
 public class OptionsPage : MonoBehaviour {
 	public Text cameraName, camResolution, camWindowEnable;
+	public InputField externalMusicPath;
 	// Use this for initialization
 	void Start () {
 		refreshCameraName();
 		refreshResolution();
 		refreshShowCam();
+		externalMusicPath.text = Setting.a.musicFolder;
 	}
 	
 	// Update is called once per frame
@@ -31,15 +33,16 @@ public class OptionsPage : MonoBehaviour {
 	}
 
 	public void onCamResSelect() {
-		if (Setting.a.cameraMultipiler == 1) {
-			Setting.a.cameraMultipiler = 2;
+		if (Setting.a.cameraMultiplier == 1) {
+			Setting.a.cameraMultiplier = 2;
 		} else {
-			Setting.a.cameraMultipiler = 1;
+			Setting.a.cameraMultiplier = 1;
 		}
 		refreshResolution();
 	}
 
 	public void OnBack() {
+		Setting.a.musicFolder = externalMusicPath.text;
 		SceneManager.LoadScene("StartPage");
 	}
 
@@ -60,7 +63,7 @@ public class OptionsPage : MonoBehaviour {
 	}
 
 	private void refreshResolution () {
-		int m = Setting.a.cameraMultipiler;
+		int m = Setting.a.cameraMultiplier;
 		camResolution.text = (320 * m).ToString() + " X " + (240 * m).ToString();
 	}
 

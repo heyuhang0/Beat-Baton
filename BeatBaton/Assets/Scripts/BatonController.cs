@@ -27,7 +27,7 @@ public class BatonController : MonoBehaviour
         batonTemplate.SetActive(false);
         scoreTemplate.SetActive(false);
 
-        cm = Setting.a.cameraMultipiler;
+        cm = Setting.a.cameraMultiplier;
 
         webCamTexture = new WebCamTexture(WebCamTexture.devices[Setting.a.cameraIndex].name, 320*cm, 480*cm, 120);
         webCamTexture.Play();

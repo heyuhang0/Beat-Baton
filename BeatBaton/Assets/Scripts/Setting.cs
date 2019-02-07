@@ -38,10 +38,9 @@ public class Setting : MonoBehaviour {
 	private static void LoadDefault () {
 		a = new GameData();
 		a.cameraIndex = 0;
-		a.cameraMultipiler = 2;
+		a.cameraMultiplier = 2;
 		a.cameraWindowEnable = true;
-		a.level = "WakeMeUp";
-
+		a.musicFolder = "";
 		a.batonProfiles = new List<BatonProfile>();
 	}
 }
@@ -49,9 +48,9 @@ public class Setting : MonoBehaviour {
 [Serializable]
 public class GameData {
 	public int cameraIndex;
-	public int cameraMultipiler;
+	public int cameraMultiplier;
 	public bool cameraWindowEnable;
-	public string level;
+	public string musicFolder;
 	public List<BatonProfile> batonProfiles;
 }
 

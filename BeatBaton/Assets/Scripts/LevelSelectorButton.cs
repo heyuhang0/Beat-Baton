@@ -13,9 +13,7 @@ public class LevelSelectorButton : MonoBehaviour {
 
 	private void OnClick () {
 		string songName = GetComponentsInChildren<Text>()[0].text;
-		string assetName = GetComponentsInChildren<Text>()[3].text;
-		Setting.a.level = assetName;
+		MusicManager.Select(songName);
 		startButtonText.text = "Start " + songName;
-		Debug.Log("Level Selected: " + Setting.a.level);
 	}
 }

@@ -24,8 +24,7 @@ public class GameController : MonoBehaviour {
 		debugCanvas.SetActive(true);
 		scoreTemplate.SetActive(false);
 
-		string fullLevelName = "Levels/" + Setting.a.level;
-		LoadMusic(fullLevelName);
+		LoadMusic();
 	}
 	
 	// Update is called once per frame
@@ -119,8 +118,8 @@ public class GameController : MonoBehaviour {
 		}
 	}
 
-	private void LoadMusic(string name) {
-		AudioClip ac = Resources.Load<AudioClip>(name);
+	private void LoadMusic() {
+		AudioClip ac = MusicManager.GetSelected();
 		AudioSource[] ass = AudioSamplerObj.GetComponentsInChildren<AudioSource>();
 		foreach (AudioSource audioSource in ass) {
 			audioSource.clip = ac;

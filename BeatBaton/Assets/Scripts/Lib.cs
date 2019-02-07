@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
+using System.IO;
 using OpenCvSharp;
 
 public class Lib : MonoBehaviour {
@@ -15,6 +16,67 @@ public class Lib : MonoBehaviour {
         float y = Mathf.Min(Mathf.Max(input.y, yl), yh);
         float z = Mathf.Min(Mathf.Max(input.z, zl), zh);
         return new Vector3(x, y, z);
+    }
+}
+
+public class MusicManager {
+    private static string selected = "";
+    public static Dictionary<string, AudioClip> playlist = new Dictionary<string, AudioClip>();
+    static MusicManager() {
+        LoadMusic();
+    }
+
+    public static void Select(string name) {
+        selected = name;
+    }
+
+    public static AudioClip GetSelected() {
+        Debug.Log(selected);
+        if (!playlist.ContainsKey(selected)) {
+            Debug.LogError("Nonexistence music name");
+            foreach (var key in playlist.Keys) {
+                selected = key;
+                break;
+            }
+        }
+        return playlist[selected];
+    }
+
+    public static void ReloadMusic() {
+        playlist.Clear();
+        LoadMusic();
+    }
+    
+    private static void LoadMusic() {
+        LoadLocalMusic();
+        LoadOutsideMusic(Setting.a.musicFolder);
+    }
+
+    private static void LoadLocalMusic() {
+        Object[] levels = Resources.LoadAll("Levels");
+        foreach (Object o in levels) {
+            playlist.Add(o.name, (AudioClip)o);
+        }
+    }
+
+    private static void LoadOutsideMusic(string path) {
+        try {
+            string[] files = Directory.GetFiles(Setting.a.musicFolder);
+            foreach (string f in files) {
+                string[] fSeparated = f.Split(new char[3] {'\\','/', '.'});
+                int length = fSeparated.Length;
+                if (!new List<string> {"ogg", "wav"}.Contains(fSeparated[length - 1])) {
+                    continue;
+                }
+                string name = fSeparated[length - 2];
+                WWW www = new WWW("file://" + f);
+                AudioClip clip = www.GetAudioClip(false);
+                while (!clip.isReadyToPlay);
+                playlist.Add(name, clip);
+            }
+        } catch (System.Exception e) {
+            
+        }
     }
 }
 

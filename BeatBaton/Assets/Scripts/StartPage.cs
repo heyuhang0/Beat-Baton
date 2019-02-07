@@ -32,7 +32,6 @@ public class StartPage : MonoBehaviour {
 	}
 
 	public void OnButtonStart () {
-		Setting.a.level = "WakeMeUp";
 		SceneManager.LoadScene("LevelSelect");
 	}
 
