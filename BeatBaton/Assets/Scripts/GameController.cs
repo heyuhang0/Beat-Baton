@@ -37,6 +37,10 @@ public class GameController : MonoBehaviour {
 			}
 		}
 
+		if ((Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.Return)) && gameEnded) {
+			OnExit();
+		}
+
 		if (!SilentAudio.isPlaying && !NormalAudio.isPlaying && Time.timeScale == 1 && !gameEnded) {
 			gameEnded = true;
 			OnGameOver();
@@ -108,6 +112,8 @@ public class GameController : MonoBehaviour {
 		musicPlayingBeforePause = AudioVisualizer.AudioSampler.instance.IsPlaying();
 		if (musicPlayingBeforePause)
 			AudioVisualizer.AudioSampler.instance.Pause();
+		
+		pauseCanvas.GetComponentInChildren<Button>().Select(); // select first button so that navigation can work
 	}
 
 	private void Resume() {

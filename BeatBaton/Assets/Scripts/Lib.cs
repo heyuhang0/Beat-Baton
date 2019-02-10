@@ -20,25 +20,28 @@ public class Lib : MonoBehaviour {
 }
 
 public class MusicManager {
-    private static string selected = "";
+    public static string selected = "";
     public static Dictionary<string, AudioClip> playlist = new Dictionary<string, AudioClip>();
     static MusicManager() {
         LoadMusic();
+        CheckDefault();
     }
 
     public static void Select(string name) {
         selected = name;
     }
 
-    public static AudioClip GetSelected() {
-        Debug.Log(selected);
+    private static void CheckDefault () {
         if (!playlist.ContainsKey(selected)) {
-            Debug.LogError("Nonexistence music name");
             foreach (var key in playlist.Keys) {
                 selected = key;
                 break;
             }
         }
+    }
+
+    public static AudioClip GetSelected() {
+        CheckDefault();
         return playlist[selected];
     }
 
